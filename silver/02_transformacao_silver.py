@@ -18,10 +18,24 @@ df_silver = spark.createDataFrame(
 # Limpa formato do período
 df_silver = df_silver.withColumn("periodo", f.regexp_replace(f.col("periodo"), "M", "/"))
 
+df_silver = df_silver.withColumn(
+    "periodo",
+    f.concat(
+        f.substring("periodo", 5, 2),
+        f.lit("/"),
+        f.substring("periodo", 1, 4)
+    )
+)
+
+df_silver = df_silver.withColumn(
+    "periodo",
+    f.to_date(f.col("periodo"), "MM/yyyy")
+)
+
 display(df_silver)
 
-# Salva na camada Silver
-df_silver.write.mode("overwrite").parquet(
-    "dbfs:/Volumes/workspace/default/arquivos-projetos/02_transformacao_silver"
-)
+# # Salva na camada Silver
+# df_silver.write.mode("overwrite").parquet(
+#     "dbfs:/Volumes/workspace/default/arquivos-projetos/02_transformacao_silver"
+# )
 
